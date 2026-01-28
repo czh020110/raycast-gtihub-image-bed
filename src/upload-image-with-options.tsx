@@ -183,7 +183,15 @@ export default function Command() {
     errorMessage: "",
   });
 
+  // Prevent duplicate uploads (React StrictMode calls useEffect twice)
+  const hasUploaded = useState({ current: false })[0];
+
   useEffect(() => {
+    if (hasUploaded.current) {
+      return; // Already uploaded, skip
+    }
+    hasUploaded.current = true;
+
     uploadImage(preferences)
       .then((url) => {
         setResult({
