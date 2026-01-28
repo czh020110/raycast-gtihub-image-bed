@@ -1,33 +1,41 @@
 # GitHub Image Bed
 
-A Raycast extension for uploading images to GitHub as an image hosting service with CDN acceleration support.
+A powerful Raycast extension for uploading images to GitHub as an image hosting service with CDN acceleration support.
 
 ## Features
 
-- 📷 **Upload images from clipboard** - Simply copy an image and run the command
-- ⚡ **CDN acceleration** - Use jsDelivr or other CDN services for faster image loading
-- 📋 **Multiple output formats** - Copy as Markdown, HTML, or direct URL
-- ⚙️ **Configurable settings** - Customize repository, branch, path, and CDN URL template
+- 📋 **Clipboard Upload** - Upload images directly from your clipboard (screenshots or copied files)
+- 📸 **Screenshot Upload** - Trigger system screenshot tool and upload immediately upon capture
+- 📂 **File Upload** - Select an image file from your computer to upload
+- ⚡ **CDN Acceleration** - Support for jsDelivr or custom CDN templates for fast image loading
+- 🎨 **Multiple Formats** - Copy result as Markdown, HTML, or direct URL
+- ⚙️ **Configurable** - Customize repository, branch, path, and CDN templates
 
-1. Clone this repository to your local machine
-2. Run `npm install` in the extension directory
-3. Run `npm run dev` to start developing
-4. In Raycast, the extension will appear automatically
+
+## Commands
+
+| Command                                | Mode    | Description                                                   |
+| -------------------------------------- | ------- | ------------------------------------------------------------- |
+| **Upload from Clipboard**              | No View | Upload current clipboard image immediately and copy the link  |
+| **Upload from Clipboard with Options** | View    | Upload clipboard image and choose output format (MD/URL/HTML) |
+| **Upload Screenshot**                  | No View | Capture a screenshot and upload it immediately                |
+| **Upload Screenshot with Options**     | View    | Capture a screenshot, upload it, and choose output format     |
+| **Upload from File**                   | View    | Open file picker to select and upload an image                |
 
 ## Configuration
 
 Before using, configure the extension preferences in Raycast:
 
-| Preference       | Description                                        | Required |
-| ---------------- | -------------------------------------------------- | -------- |
-| GitHub Token     | Personal Access Token with `repo` scope            | ✅       |
-| Repository Owner | Your GitHub username or organization               | ✅       |
-| Repository Name  | The repository to upload images to                 | ✅       |
-| Branch           | Branch name (default: `main`)                      | ❌       |
-| Upload Path      | Folder path in the repository (default: `images/`) | ❌       |
-| Committer Email  | Email for commit messages                          | ✅       |
-| CDN URL Template | Custom CDN URL (default: jsDelivr)                 | ❌       |
-| Default Format   | Default output format (Markdown/URL/HTML)          | ❌       |
+| Preference       | Description                                     | Required |
+| ---------------- | ----------------------------------------------- | -------- |
+| GitHub Token     | Personal Access Token with `repo` scope         | ✅       |
+| Repository Owner | Your GitHub username or organization            | ✅       |
+| Repository Name  | The repository to upload images to              | ✅       |
+| Branch           | Branch name (default: `main`)                   | ❌       |
+| Upload Path      | Folder path in the repository (e.g., `images/`) | ❌       |
+| Committer Email  | Email for commit messages                       | ✅       |
+| CDN URL Template | Custom CDN URL (default: jsDelivr)              | ❌       |
+| Default Format   | Default output format (Markdown/URL/HTML)       | ❌       |
 
 ### CDN URL Template
 
@@ -48,32 +56,33 @@ Available placeholders:
 
 1. Go to [GitHub Settings > Developer settings > Personal access tokens](https://github.com/settings/tokens)
 2. Click "Generate new token (classic)"
-3. Give it a descriptive name
+3. Give it a descriptive name (e.g., "Raycast Image Bed")
 4. Select the `repo` scope
 5. Click "Generate token"
 6. Copy the token and paste it in the extension preferences
 
 ## Usage
 
-### Quick Upload (No View)
+### 1. From Clipboard
 
-1. Copy an image to clipboard (screenshot or copy file from Finder)
-2. Open Raycast and search for "Upload Image"
-3. The image will be uploaded and the URL copied to clipboard automatically
+1. Copy an image to your clipboard (or a file from Finder/Explorer).
+2. Run **Upload from Clipboard**.
+3. The image is uploaded, and the link is automatically copied.
 
-### Upload with Options (List View)
+### 2. Screenshot
 
-1. Copy an image to clipboard
-2. Open Raycast and search for "Upload Image with Options"
-3. After upload, choose your preferred format (Markdown/URL/HTML)
-4. Press Enter to copy the selected format
+1. Run **Upload Screenshot**.
+2. Raycast will hide, and the system screenshot tool (`ms-screenclip` on Windows) will open.
+3. Capture your area.
+4. Raycast will reappear, upload the image, and copy the link.
+   - Use **Upload Screenshot with Options** if you want to select the link format manually.
 
-## Commands
+### 3. From File
 
-| Command                   | Description                        | Mode      |
-| ------------------------- | ---------------------------------- | --------- |
-| Upload Image              | Quick upload and copy to clipboard | No View   |
-| Upload Image with Options | Upload and choose output format    | List View |
+1. Run **Upload from File**.
+2. A file picker dialog will appear.
+3. Select your image file.
+4. The image is uploaded, and you can choose the link format to copy.
 
 ## License
 

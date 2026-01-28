@@ -3,7 +3,7 @@
   "name": "github-image-bed",
   "title": "GitHub Image Bed",
   "description": "Upload images to GitHub as an image hosting service with CDN acceleration support.",
-  "icon": "extension-icon.png",
+  "icon": "image.png",
   "author": "czh020110",
   "categories": [
     "Productivity"
