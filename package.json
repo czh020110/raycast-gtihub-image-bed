@@ -11,15 +11,27 @@
   "license": "MIT",
   "commands": [
     {
-      "name": "upload-image",
-      "title": "Upload Image",
+      "name": "upload-from-clipboard",
+      "title": "Upload from Clipboard",
       "description": "Upload image from clipboard to GitHub",
       "mode": "no-view"
     },
     {
-      "name": "upload-image-with-options",
-      "title": "Upload Image with Options",
-      "description": "Upload image and choose output format",
+      "name": "upload-from-clipboard-with-options",
+      "title": "Upload from Clipboard with Options",
+      "description": "Upload clipboard image and choose output format",
+      "mode": "view"
+    },
+    {
+      "name": "upload-screenshot",
+      "title": "Upload Screenshot",
+      "description": "Take screenshot and upload to GitHub",
+      "mode": "no-view"
+    },
+    {
+      "name": "upload-screenshot-with-options",
+      "title": "Upload Screenshot with Options",
+      "description": "Take screenshot, upload, and choose output format",
       "mode": "view"
     }
   ],

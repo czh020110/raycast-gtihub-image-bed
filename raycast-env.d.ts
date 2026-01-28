@@ -30,16 +30,24 @@ type ExtensionPreferences = {
 declare type Preferences = ExtensionPreferences
 
 declare namespace Preferences {
-  /** Preferences accessible in the `upload-image` command */
-  export type UploadImage = ExtensionPreferences & {}
-  /** Preferences accessible in the `upload-image-with-options` command */
-  export type UploadImageWithOptions = ExtensionPreferences & {}
+  /** Preferences accessible in the `upload-from-clipboard` command */
+  export type UploadFromClipboard = ExtensionPreferences & {}
+  /** Preferences accessible in the `upload-from-clipboard-with-options` command */
+  export type UploadFromClipboardWithOptions = ExtensionPreferences & {}
+  /** Preferences accessible in the `upload-screenshot` command */
+  export type UploadScreenshot = ExtensionPreferences & {}
+  /** Preferences accessible in the `upload-screenshot-with-options` command */
+  export type UploadScreenshotWithOptions = ExtensionPreferences & {}
 }
 
 declare namespace Arguments {
-  /** Arguments passed to the `upload-image` command */
-  export type UploadImage = {}
-  /** Arguments passed to the `upload-image-with-options` command */
-  export type UploadImageWithOptions = {}
+  /** Arguments passed to the `upload-from-clipboard` command */
+  export type UploadFromClipboard = {}
+  /** Arguments passed to the `upload-from-clipboard-with-options` command */
+  export type UploadFromClipboardWithOptions = {}
+  /** Arguments passed to the `upload-screenshot` command */
+  export type UploadScreenshot = {}
+  /** Arguments passed to the `upload-screenshot-with-options` command */
+  export type UploadScreenshotWithOptions = {}
 }
 
