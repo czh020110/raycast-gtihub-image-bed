@@ -33,6 +33,12 @@
       "title": "Upload Screenshot with Options",
       "description": "Take screenshot, upload, and choose output format",
       "mode": "view"
+    },
+    {
+      "name": "upload-from-file",
+      "title": "Upload from File",
+      "description": "Select image file and upload to GitHub",
+      "mode": "view"
     }
   ],
   "preferences": [
