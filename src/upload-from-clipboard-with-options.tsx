@@ -8,14 +8,17 @@ import {
   showToast,
   Toast,
   Clipboard,
+  LaunchProps,
 } from "@raycast/api";
 import { useState, useEffect } from "react";
 import * as fs from "fs";
-import dayjs from "dayjs";
 import * as fileType from "file-type";
 import { Octokit } from "@octokit/core";
 import { RequestError } from "@octokit/request-error";
-import { saveClipboardImageToFile } from "./utils";
+import {
+  saveClipboardImageToFile,
+  generateFilenameFromTemplate,
+} from "./utils";
 import * as os from "os";
 import * as path from "path";
 
@@ -28,6 +31,11 @@ interface Preferences {
   email: string;
   cdnUrl: string;
   defaultFormat: "markdown" | "url" | "html";
+  filenameTemplate: string;
+}
+
+interface Arguments {
+  imageName?: string;
 }
 
 interface UploadResult {
@@ -86,15 +94,6 @@ async function getImageFromClipboard(): Promise<{
 }
 
 /**
- * Generate unique filename with timestamp
- */
-function generateFilename(ext: string): string {
-  const timestamp = dayjs().format("YYYY-MM-DD_HHmmss");
-  const random = Math.random().toString(36).substring(2, 8);
-  return `${timestamp}_${random}.${ext}`;
-}
-
-/**
  * Format path to ensure it ends with /
  */
 function normalizePath(path: string): string {
@@ -129,7 +128,10 @@ function buildCdnUrl(
 /**
  * Upload image to GitHub
  */
-async function uploadImage(preferences: Preferences): Promise<string> {
+async function uploadImage(
+  preferences: Preferences,
+  imageName: string = "",
+): Promise<string> {
   const image = await getImageFromClipboard();
 
   if (!image) {
@@ -138,7 +140,11 @@ async function uploadImage(preferences: Preferences): Promise<string> {
 
   const content = image.buffer.toString("base64");
   const path = normalizePath(preferences.path);
-  const filename = generateFilename(image.ext);
+  const filename = generateFilenameFromTemplate(
+    preferences.filenameTemplate,
+    image.ext,
+    imageName,
+  );
   const filePath = `${path}${filename}`;
 
   const octokit = new Octokit({ auth: preferences.githubToken });
@@ -175,8 +181,9 @@ async function uploadImage(preferences: Preferences): Promise<string> {
   );
 }
 
-export default function Command() {
+export default function Command(props: LaunchProps<{ arguments: Arguments }>) {
   const preferences = getPreferenceValues<Preferences>();
+  const { imageName } = props.arguments;
   const [result, setResult] = useState<UploadResult>({
     status: "loading",
     url: "",
@@ -192,7 +199,7 @@ export default function Command() {
     }
     hasUploaded.current = true;
 
-    uploadImage(preferences)
+    uploadImage(preferences, imageName || "")
       .then((url) => {
         setResult({
           status: "success",

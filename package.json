@@ -14,31 +14,71 @@
       "name": "upload-from-clipboard",
       "title": "Upload from Clipboard",
       "description": "Upload image from clipboard to GitHub",
-      "mode": "no-view"
+      "mode": "no-view",
+      "arguments": [
+        {
+          "name": "imageName",
+          "type": "text",
+          "required": false,
+          "placeholder": "Image name"
+        }
+      ]
     },
     {
       "name": "upload-from-clipboard-with-options",
       "title": "Upload from Clipboard with Options",
       "description": "Upload clipboard image and choose output format",
-      "mode": "view"
+      "mode": "view",
+      "arguments": [
+        {
+          "name": "imageName",
+          "type": "text",
+          "required": false,
+          "placeholder": "Image name"
+        }
+      ]
     },
     {
       "name": "upload-screenshot",
       "title": "Upload Screenshot",
       "description": "Take screenshot and upload to GitHub",
-      "mode": "no-view"
+      "mode": "no-view",
+      "arguments": [
+        {
+          "name": "imageName",
+          "type": "text",
+          "required": false,
+          "placeholder": "Image name"
+        }
+      ]
     },
     {
       "name": "upload-screenshot-with-options",
       "title": "Upload Screenshot with Options",
       "description": "Take screenshot, upload, and choose output format",
-      "mode": "view"
+      "mode": "view",
+      "arguments": [
+        {
+          "name": "imageName",
+          "type": "text",
+          "required": false,
+          "placeholder": "Image name"
+        }
+      ]
     },
     {
       "name": "upload-from-file",
       "title": "Upload from File",
       "description": "Select image file and upload to GitHub",
-      "mode": "view"
+      "mode": "view",
+      "arguments": [
+        {
+          "name": "imageName",
+          "type": "text",
+          "required": false,
+          "placeholder": "Image name"
+        }
+      ]
     }
   ],
   "preferences": [
@@ -115,6 +155,14 @@
           "value": "html"
         }
       ]
+    },
+    {
+      "name": "filenameTemplate",
+      "title": "Filename Template",
+      "type": "textfield",
+      "required": false,
+      "default": "{yyyy}-{MM}-{dd}_{hh}{mm}{ss}_{name}",
+      "description": "Template for uploaded image filename. Placeholders: {yyyy}, {yy}, {MM}, {dd}, {hh}, {mm}, {ss}, {sss}, {name}. Leave {name} for argument input."
     }
   ],
   "dependencies": {

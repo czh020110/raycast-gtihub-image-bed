@@ -2,6 +2,53 @@ import { execSync } from "child_process";
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
+import dayjs from "dayjs";
+
+/**
+ * Generate filename from template with placeholder replacement
+ * Placeholders: {yyyy}, {yy}, {MM}, {dd}, {hh}, {mm}, {ss}, {sss}, {name}
+ */
+export function generateFilenameFromTemplate(
+  template: string,
+  ext: string,
+  name: string = "",
+): string {
+  const now = dayjs();
+  const random = Math.random().toString(36).substring(2, 8);
+
+  // If template is empty or undefined, use default format
+  if (!template || !template.trim()) {
+    const timestamp = now.format("YYYY-MM-DD_HHmmss");
+    return name
+      ? `${timestamp}_${name}.${ext}`
+      : `${timestamp}_${random}.${ext}`;
+  }
+
+  let filename = template
+    .replace(/{yyyy}/g, now.format("YYYY"))
+    .replace(/{yy}/g, now.format("YY"))
+    .replace(/{MM}/g, now.format("MM"))
+    .replace(/{dd}/g, now.format("DD"))
+    .replace(/{hh}/g, now.format("HH"))
+    .replace(/{mm}/g, now.format("mm"))
+    .replace(/{ss}/g, now.format("ss"))
+    .replace(/{sss}/g, now.format("SSS"))
+    .replace(/{name}/g, name || "")
+    .replace(/{random}/g, random);
+
+  // Clean up: remove trailing/leading underscores/hyphens and consecutive separators
+  filename = filename
+    .replace(/[-_]+$/, "")
+    .replace(/^[-_]+/, "")
+    .replace(/[-_]{2,}/g, "_");
+
+  // If filename is empty after processing, use default
+  if (!filename.trim()) {
+    filename = `${now.format("YYYY-MM-DD_HHmmss")}_${random}`;
+  }
+
+  return `${filename}.${ext}`;
+}
 
 /**
  * Saves the clipboard image to a temporary file.

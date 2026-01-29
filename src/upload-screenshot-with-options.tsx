@@ -17,11 +17,11 @@ import { useState, useEffect } from "react";
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
-import dayjs from "dayjs";
 import { Octokit } from "@octokit/core";
 import { RequestError } from "@octokit/request-error";
 import { exec } from "child_process";
 import { promisify } from "util";
+import { generateFilenameFromTemplate } from "./utils";
 
 const execAsync = promisify(exec);
 
@@ -34,26 +34,23 @@ interface Preferences {
   email: string;
   cdnUrl: string;
   defaultFormat: "markdown" | "url" | "html";
+  filenameTemplate: string;
+}
+
+interface Arguments {
+  imageName?: string;
 }
 
 interface LaunchContext {
   screenshotPath?: string;
   cancelled?: boolean;
+  imageName?: string;
 }
 
 interface UploadResult {
   status: "loading" | "success" | "error" | "waiting";
   url: string;
   errorMessage: string;
-}
-
-/**
- * Generate unique filename with timestamp
- */
-function generateFilename(ext: string): string {
-  const timestamp = dayjs().format("YYYY-MM-DD_HHmmss");
-  const random = Math.random().toString(36).substring(2, 8);
-  return `${timestamp}_${random}.${ext}`;
 }
 
 /**
@@ -94,10 +91,15 @@ function buildCdnUrl(
 async function uploadImageBuffer(
   buffer: Buffer,
   preferences: Preferences,
+  imageName: string = "",
 ): Promise<string> {
   const content = buffer.toString("base64");
   const p = normalizePath(preferences.path);
-  const filename = generateFilename("png");
+  const filename = generateFilenameFromTemplate(
+    preferences.filenameTemplate,
+    "png",
+    imageName,
+  );
   const filePath = `${p}${filename}`;
 
   const octokit = new Octokit({ auth: preferences.githubToken });
@@ -127,7 +129,9 @@ async function uploadImageBuffer(
 /**
  * Trigger system screenshot and callback via Deep Link
  */
-async function triggerScreenshotAndCallback(): Promise<void> {
+async function triggerScreenshotAndCallback(
+  imageName: string = "",
+): Promise<void> {
   const timestamp = Date.now();
   const filePath = path.join(os.tmpdir(), `screenshot-${timestamp}.png`);
   const filePathEscaped = filePath.replace(/\\/g, "\\\\");
@@ -193,7 +197,7 @@ if ($img -ne $null) {
 
       if (stdout.trim().includes("SAVED") && fs.existsSync(filePath)) {
         // Screenshot successful, callback via Deep Link
-        const context = JSON.stringify({ screenshotPath: filePath });
+        const context = JSON.stringify({ screenshotPath: filePath, imageName });
         const encodedContext = encodeURIComponent(context);
         await open(
           `raycast://extensions/${environment.ownerOrAuthorName}/${environment.extensionName}/upload-screenshot-with-options?launchContext=${encodedContext}`,
@@ -214,10 +218,12 @@ if ($img -ne $null) {
 }
 
 export default function Command(
-  props: LaunchProps<{ launchContext?: LaunchContext }>,
+  props: LaunchProps<{ arguments: Arguments; launchContext?: LaunchContext }>,
 ) {
   const preferences = getPreferenceValues<Preferences>();
   const { launchContext } = props;
+  const imageName =
+    launchContext?.imageName || props.arguments?.imageName || "";
 
   const [result, setResult] = useState<UploadResult>({
     status: "waiting",
@@ -234,7 +240,7 @@ export default function Command(
 
     if (!launchContext) {
       // Initial launch: trigger screenshot
-      triggerScreenshotAndCallback();
+      triggerScreenshotAndCallback(imageName);
       return;
     }
 
@@ -267,7 +273,7 @@ export default function Command(
             fs.unlinkSync(launchContext.screenshotPath);
           } catch {}
 
-          const url = await uploadImageBuffer(buffer, preferences);
+          const url = await uploadImageBuffer(buffer, preferences, imageName);
 
           setResult({
             status: "success",

@@ -23,7 +23,9 @@ type ExtensionPreferences = {
   /** CDN URL Template - CDN URL template. Use {owner}, {repo}, {branch}, {path} as placeholders. */
   "cdnUrl": string,
   /** Default Output Format - Default format for copied URL. */
-  "defaultFormat": "markdown" | "url" | "html"
+  "defaultFormat": "markdown" | "url" | "html",
+  /** Filename Template - Template for uploaded image filename. Placeholders: {yyyy}, {yy}, {MM}, {dd}, {hh}, {mm}, {ss}, {sss}, {name}. Leave {name} for argument input. */
+  "filenameTemplate": string
 }
 
 /** Preferences accessible in all the extension's commands */
@@ -44,14 +46,29 @@ declare namespace Preferences {
 
 declare namespace Arguments {
   /** Arguments passed to the `upload-from-clipboard` command */
-  export type UploadFromClipboard = {}
+  export type UploadFromClipboard = {
+  /** Image name */
+  "imageName": string
+}
   /** Arguments passed to the `upload-from-clipboard-with-options` command */
-  export type UploadFromClipboardWithOptions = {}
+  export type UploadFromClipboardWithOptions = {
+  /** Image name */
+  "imageName": string
+}
   /** Arguments passed to the `upload-screenshot` command */
-  export type UploadScreenshot = {}
+  export type UploadScreenshot = {
+  /** Image name */
+  "imageName": string
+}
   /** Arguments passed to the `upload-screenshot-with-options` command */
-  export type UploadScreenshotWithOptions = {}
+  export type UploadScreenshotWithOptions = {
+  /** Image name */
+  "imageName": string
+}
   /** Arguments passed to the `upload-from-file` command */
-  export type UploadFromFile = {}
+  export type UploadFromFile = {
+  /** Image name */
+  "imageName": string
+}
 }
 

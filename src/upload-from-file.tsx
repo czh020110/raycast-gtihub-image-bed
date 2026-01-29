@@ -16,12 +16,12 @@ import { useState, useEffect } from "react";
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
-import dayjs from "dayjs";
 import * as fileType from "file-type";
 import { Octokit } from "@octokit/core";
 import { RequestError } from "@octokit/request-error";
 import { exec } from "child_process";
 import { promisify } from "util";
+import { generateFilenameFromTemplate } from "./utils";
 
 const execAsync = promisify(exec);
 
@@ -34,26 +34,23 @@ interface Preferences {
   email: string;
   cdnUrl: string;
   defaultFormat: "markdown" | "url" | "html";
+  filenameTemplate: string;
+}
+
+interface Arguments {
+  imageName?: string;
 }
 
 interface LaunchContext {
   filePath?: string;
   cancelled?: boolean;
+  imageName?: string;
 }
 
 interface UploadResult {
   status: "loading" | "success" | "error" | "waiting";
   url: string;
   errorMessage: string;
-}
-
-/**
- * Generate unique filename with timestamp
- */
-function generateFilename(ext: string): string {
-  const timestamp = dayjs().format("YYYY-MM-DD_HHmmss");
-  const random = Math.random().toString(36).substring(2, 8);
-  return `${timestamp}_${random}.${ext}`;
 }
 
 /**
@@ -95,10 +92,15 @@ async function uploadImageBuffer(
   buffer: Buffer,
   ext: string,
   preferences: Preferences,
+  imageName: string = "",
 ): Promise<string> {
   const content = buffer.toString("base64");
   const p = normalizePath(preferences.path);
-  const filename = generateFilename(ext);
+  const filename = generateFilenameFromTemplate(
+    preferences.filenameTemplate,
+    ext,
+    imageName,
+  );
   const filePath = `${p}${filename}`;
 
   const octokit = new Octokit({ auth: preferences.githubToken });
@@ -128,7 +130,9 @@ async function uploadImageBuffer(
 /**
  * Open file picker dialog and callback via Deep Link
  */
-async function openFilePickerAndCallback(): Promise<void> {
+async function openFilePickerAndCallback(
+  imageName: string = "",
+): Promise<void> {
   // Hide Raycast window
   await closeMainWindow({ clearRootSearch: true });
   await new Promise((resolve) => setTimeout(resolve, 300));
@@ -169,7 +173,7 @@ if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
     }
 
     // File selected, callback via Deep Link
-    const context = JSON.stringify({ filePath: selectedPath });
+    const context = JSON.stringify({ filePath: selectedPath, imageName });
     const encodedContext = encodeURIComponent(context);
     await open(
       `raycast://extensions/${environment.ownerOrAuthorName}/${environment.extensionName}/upload-from-file?launchContext=${encodedContext}`,
@@ -187,10 +191,12 @@ if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
 }
 
 export default function Command(
-  props: LaunchProps<{ launchContext?: LaunchContext }>,
+  props: LaunchProps<{ arguments: Arguments; launchContext?: LaunchContext }>,
 ) {
   const preferences = getPreferenceValues<Preferences>();
   const { launchContext } = props;
+  const imageName =
+    launchContext?.imageName || props.arguments?.imageName || "";
 
   const [result, setResult] = useState<UploadResult>({
     status: "waiting",
@@ -207,7 +213,7 @@ export default function Command(
 
     if (!launchContext) {
       // Initial launch: open file picker
-      openFilePickerAndCallback();
+      openFilePickerAndCallback(imageName);
       return;
     }
 
@@ -247,7 +253,12 @@ export default function Command(
             throw new Error("Selected file is not a valid image");
           }
 
-          const url = await uploadImageBuffer(buffer, type.ext, preferences);
+          const url = await uploadImageBuffer(
+            buffer,
+            type.ext,
+            preferences,
+            imageName,
+          );
 
           setResult({
             status: "success",
