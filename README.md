@@ -8,9 +8,9 @@ A powerful Raycast extension for uploading images to GitHub as an image hosting 
 - 📸 **Screenshot Upload** - Trigger system screenshot tool and upload immediately upon capture
 - 📂 **File Upload** - Select an image file from your computer to upload
 - ⚡ **CDN Acceleration** - Support for jsDelivr or custom CDN templates for fast image loading
+- 🏷️ **Custom Filenames** - Set image names via command argument or configurable templates with time/date placeholders
 - 🎨 **Multiple Formats** - Copy result as Markdown, HTML, or direct URL
-- ⚙️ **Configurable** - Customize repository, branch, path, and CDN templates
-
+- ⚙️ **Configurable** - Customize repository, branch, path, CDN templates, and filename patterns
 
 ## Commands
 
@@ -26,16 +26,40 @@ A powerful Raycast extension for uploading images to GitHub as an image hosting 
 
 Before using, configure the extension preferences in Raycast:
 
-| Preference       | Description                                     | Required |
-| ---------------- | ----------------------------------------------- | -------- |
-| GitHub Token     | Personal Access Token with `repo` scope         | ✅       |
-| Repository Owner | Your GitHub username or organization            | ✅       |
-| Repository Name  | The repository to upload images to              | ✅       |
-| Branch           | Branch name (default: `main`)                   | ❌       |
-| Upload Path      | Folder path in the repository (e.g., `images/`) | ❌       |
-| Committer Email  | Email for commit messages                       | ✅       |
-| CDN URL Template | Custom CDN URL (default: jsDelivr)              | ❌       |
-| Default Format   | Default output format (Markdown/URL/HTML)       | ❌       |
+| Preference        | Description                                     | Required |
+| ----------------- | ----------------------------------------------- | -------- |
+| GitHub Token      | Personal Access Token with `repo` scope         | ✅       |
+| Repository Owner  | Your GitHub username or organization            | ✅       |
+| Repository Name   | The repository to upload images to              | ✅       |
+| Branch            | Branch name (default: `main`)                   | ❌       |
+| Upload Path       | Folder path in the repository (e.g., `images/`) | ❌       |
+| Committer Email   | Email for commit messages                       | ✅       |
+| CDN URL Template  | Custom CDN URL (default: jsDelivr)              | ❌       |
+| Default Format    | Default output format (Markdown/URL/HTML)       | ❌       |
+| Filename Template | Template for naming uploaded images             | ❌       |
+
+### Filename Template
+
+Customize how uploaded files are named using the **Filename Template** preference.
+
+**Default:** `{yyyy}-{MM}-{dd}_{hh}{mm}{ss}_{name}`
+
+**Supported Placeholders:**
+
+- `{yyyy}`: Year (4 digits, e.g., 2024)
+- `{yy}`: Year (2 digits, e.g., 24)
+- `{MM}`: Month (01-12)
+- `{dd}`: Day (01-31)
+- `{hh}`: Hour (00-23)
+- `{mm}`: Minute (00-59)
+- `{ss}`: Second (00-59)
+- `{sss}`: Millisecond (000-999)
+- `{name}`: The custom name entered in the command argument (if any)
+- `{random}`: A random alphanumeric string (6 chars)
+
+**Example:**
+If template is `{yy}{MM}{dd}-{name}` and you enter "logo" in the command argument on Jan 1st 2024:
+Result: `240101-logo.png`
 
 ### CDN URL Template
 
