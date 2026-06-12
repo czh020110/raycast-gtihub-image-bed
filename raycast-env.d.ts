@@ -40,6 +40,8 @@ declare namespace Preferences {
   export type UploadScreenshot = ExtensionPreferences & {}
   /** Preferences accessible in the `upload-screenshot-with-options` command */
   export type UploadScreenshotWithOptions = ExtensionPreferences & {}
+  /** Preferences accessible in the `choose-format` command */
+  export type ChooseFormat = ExtensionPreferences & {}
   /** Preferences accessible in the `upload-from-file` command */
   export type UploadFromFile = ExtensionPreferences & {}
 }
@@ -65,6 +67,8 @@ declare namespace Arguments {
   /** Image name */
   "imageName": string
 }
+  /** Arguments passed to the `choose-format` command */
+  export type ChooseFormat = {}
   /** Arguments passed to the `upload-from-file` command */
   export type UploadFromFile = {
   /** Image name */

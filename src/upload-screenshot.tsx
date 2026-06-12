@@ -5,289 +5,85 @@ import {
   getPreferenceValues,
   showHUD,
   closeMainWindow,
-  open,
-  environment,
   LaunchProps,
 } from "@raycast/api";
-import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
-import { Octokit } from "@octokit/core";
 import { RequestError } from "@octokit/request-error";
-import { exec } from "child_process";
-import { promisify } from "util";
-import { generateFilenameFromTemplate } from "./utils";
-
-const execAsync = promisify(exec);
-
-interface Preferences {
-  githubToken: string;
-  owner: string;
-  repo: string;
-  branch: string;
-  path: string;
-  email: string;
-  cdnUrl: string;
-  defaultFormat: "markdown" | "url" | "html";
-  filenameTemplate: string;
-}
-
-interface Arguments {
-  imageName?: string;
-}
-
-interface LaunchContext {
-  screenshotPath?: string;
-  cancelled?: boolean;
-  imageName?: string;
-}
+import {
+  Preferences,
+  Arguments,
+  formatUrl,
+  uploadImageBuffer,
+  takeScreenshot,
+} from "./utils";
 
 /**
- * Format path to ensure it ends with /
- */
-function normalizePath(p: string): string {
-  if (!p) return "";
-  let normalized = p;
-  if (normalized.startsWith("/")) {
-    normalized = normalized.substring(1);
-  }
-  if (normalized && !normalized.endsWith("/")) {
-    normalized += "/";
-  }
-  return normalized;
-}
-
-/**
- * Build CDN URL from template
- */
-function buildCdnUrl(
-  template: string,
-  owner: string,
-  repo: string,
-  branch: string,
-  filePath: string,
-): string {
-  return template
-    .replace("{owner}", owner)
-    .replace("{repo}", repo)
-    .replace("{branch}", branch)
-    .replace("{path}", filePath);
-}
-
-/**
- * Format URL based on selected format
- */
-function formatUrl(url: string, format: "markdown" | "url" | "html"): string {
-  switch (format) {
-    case "markdown":
-      return `![](${url})`;
-    case "html":
-      return `<img src="${url}" alt="" />`;
-    case "url":
-    default:
-      return url;
-  }
-}
-
-/**
- * Upload image buffer to GitHub
- */
-async function uploadImageBuffer(
-  buffer: Buffer,
-  preferences: Preferences,
-  imageName: string = "",
-): Promise<string> {
-  const content = buffer.toString("base64");
-  const p = normalizePath(preferences.path);
-  const filename = generateFilenameFromTemplate(
-    preferences.filenameTemplate,
-    "png",
-    imageName,
-  );
-  const filePath = `${p}${filename}`;
-
-  const octokit = new Octokit({ auth: preferences.githubToken });
-
-  await octokit.request("PUT /repos/{owner}/{repo}/contents/{path}", {
-    owner: preferences.owner,
-    repo: preferences.repo,
-    path: filePath,
-    message: `Upload screenshot: ${filename}`,
-    committer: {
-      name: preferences.owner,
-      email: preferences.email,
-    },
-    content: content,
-    branch: preferences.branch || "main",
-  });
-
-  return buildCdnUrl(
-    preferences.cdnUrl,
-    preferences.owner,
-    preferences.repo,
-    preferences.branch || "main",
-    filePath,
-  );
-}
-
-/**
- * Trigger system screenshot and callback via Deep Link
- */
-async function triggerScreenshotAndCallback(
-  imageName: string = "",
-): Promise<void> {
-  const timestamp = Date.now();
-  const filePath = path.join(os.tmpdir(), `screenshot-${timestamp}.png`);
-  const filePathEscaped = filePath.replace(/\\/g, "\\\\");
-
-  // 1. Hide Raycast window
-  await closeMainWindow({ clearRootSearch: true });
-  await new Promise((resolve) => setTimeout(resolve, 500));
-
-  // 2. Clear clipboard
-  try {
-    await execAsync(
-      `powershell -Command "Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.Clipboard]::Clear()"`,
-    );
-  } catch {}
-
-  // 3. Launch screenshot tool
-  try {
-    await execAsync(`explorer.exe ms-screenclip:`);
-  } catch {
-    try {
-      await execAsync(`powershell -Command "Start-Process 'ms-screenclip:'"`);
-    } catch {
-      const context = JSON.stringify({ cancelled: true });
-      const encodedContext = encodeURIComponent(context);
-      await open(
-        `raycast://extensions/${environment.ownerOrAuthorName}/${environment.extensionName}/upload-screenshot?launchContext=${encodedContext}`,
-      );
-      return;
-    }
-  }
-
-  // 4. Poll for clipboard image
-  let attempts = 0;
-  const maxAttempts = 120;
-
-  while (attempts < maxAttempts) {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    attempts++;
-
-    try {
-      const scriptPath = path.join(
-        os.tmpdir(),
-        `check-clipboard-${timestamp}.ps1`,
-      );
-      const checkAndSaveScript = `
-Add-Type -AssemblyName System.Windows.Forms
-Add-Type -AssemblyName System.Drawing
-$img = [System.Windows.Forms.Clipboard]::GetImage()
-if ($img -ne $null) {
-    $img.Save('${filePathEscaped}', [System.Drawing.Imaging.ImageFormat]::Png)
-    Write-Output 'SAVED'
-} else {
-    Write-Output 'EMPTY'
-}
-`;
-      fs.writeFileSync(scriptPath, checkAndSaveScript, "utf-8");
-      const { stdout } = await execAsync(
-        `powershell -ExecutionPolicy Bypass -File "${scriptPath}"`,
-      );
-      try {
-        fs.unlinkSync(scriptPath);
-      } catch {}
-
-      if (stdout.trim().includes("SAVED") && fs.existsSync(filePath)) {
-        // Screenshot successful, callback via Deep Link
-        const context = JSON.stringify({ screenshotPath: filePath, imageName });
-        const encodedContext = encodeURIComponent(context);
-        await open(
-          `raycast://extensions/${environment.ownerOrAuthorName}/${environment.extensionName}/upload-screenshot?launchContext=${encodedContext}`,
-        );
-        return;
-      }
-    } catch {
-      // Continue waiting
-    }
-  }
-
-  // Timeout, notify cancelled
-  const context = JSON.stringify({ cancelled: true });
-  const encodedContext = encodeURIComponent(context);
-  await open(
-    `raycast://extensions/${environment.ownerOrAuthorName}/${environment.extensionName}/upload-screenshot?launchContext=${encodedContext}`,
-  );
-}
-
-/**
- * Main command: Screenshot and upload
+ * Main command: Take screenshot and upload to GitHub
+ * Uses macOS native screencapture command
  */
 export default async function Command(
-  props: LaunchProps<{ arguments: Arguments; launchContext?: LaunchContext }>,
+  props: LaunchProps<{ arguments: Arguments }>,
 ) {
   const preferences = getPreferenceValues<Preferences>();
-  const { launchContext } = props;
-  const imageName =
-    launchContext?.imageName || props.arguments?.imageName || "";
+  const { imageName } = props.arguments;
 
-  // Handle Deep Link callback
-  if (launchContext) {
-    if (launchContext.cancelled) {
-      await showToast({
-        style: Toast.Style.Failure,
-        title: "Screenshot cancelled",
-      });
-      return;
-    }
+  // Prepare temp file path for screenshot output
+  const screenshotPath = path.join(
+    os.tmpdir(),
+    `screenshot-${Date.now()}.png`,
+  );
 
-    if (launchContext.screenshotPath) {
-      const toast = await showToast({
-        style: Toast.Style.Animated,
-        title: "Uploading screenshot...",
-      });
+  // Start screencapture (non-blocking spawn)
+  const screenshotPromise = takeScreenshot(screenshotPath);
 
-      try {
-        if (!fs.existsSync(launchContext.screenshotPath)) {
-          throw new Error("Screenshot file not found");
-        }
+  // Close Raycast window so user can see the screen for selection
+  await closeMainWindow({clearRootSearch: true });
 
-        const buffer = fs.readFileSync(launchContext.screenshotPath);
+  // Wait for screencapture to finish (user completes selection or cancels)
+  const buffer = await screenshotPromise;
 
-        // Clean up temp file
-        try {
-          fs.unlinkSync(launchContext.screenshotPath);
-        } catch {}
-
-        const url = await uploadImageBuffer(buffer, preferences, imageName);
-        const formattedUrl = formatUrl(url, preferences.defaultFormat);
-
-        await Clipboard.copy(formattedUrl);
-
-        toast.style = Toast.Style.Success;
-        toast.title = "Screenshot uploaded!";
-        toast.message = "URL copied to clipboard";
-
-        await showHUD("✅ Screenshot uploaded! URL copied to clipboard");
-      } catch (error) {
-        toast.style = Toast.Style.Failure;
-
-        if (error instanceof RequestError) {
-          toast.title = "GitHub API Error";
-          toast.message = error.message;
-        } else if (error instanceof Error) {
-          toast.title = "Upload Failed";
-          toast.message = error.message;
-        } else {
-          toast.title = "Upload Failed";
-          toast.message = "Unknown error occurred";
-        }
-      }
-      return;
-    }
+  if (!buffer) {
+    await showToast({
+      style: Toast.Style.Failure,
+      title: "Screenshot cancelled",
+    });
+    return;
   }
 
-  // Initial launch: trigger screenshot
-  await triggerScreenshotAndCallback(imageName);
+  const toast = await showToast({
+    style: Toast.Style.Animated,
+    title: "Uploading screenshot...",
+  });
+
+  try {
+    const url = await uploadImageBuffer(
+      buffer,
+      "png",
+      preferences,
+      imageName || "",
+    );
+    const formattedUrl = formatUrl(url, preferences.defaultFormat);
+
+    await Clipboard.copy(formattedUrl);
+
+    toast.style = Toast.Style.Success;
+    toast.title = "Screenshot uploaded!";
+    toast.message = "URL copied to clipboard";
+
+    await showHUD("✅ Screenshot uploaded! URL copied to clipboard");
+  } catch (error) {
+    toast.style = Toast.Style.Failure;
+
+    if (error instanceof RequestError) {
+      toast.title = "GitHub API Error";
+      toast.message = error.message;
+    } else if (error instanceof Error) {
+      toast.title = "Upload Failed";
+      toast.message = error.message;
+    } else {
+      toast.title = "Upload Failed";
+      toast.message = "Unknown error occurred";
+    }
+  }
 }
