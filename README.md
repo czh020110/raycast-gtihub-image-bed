@@ -1,6 +1,10 @@
 # GitHub Image Bed
 
+[中文](README-zh.md)
+
 A powerful Raycast extension for uploading images to GitHub as an image hosting service with CDN acceleration support.
+
+![](metadata/ghimage-main.png)
 
 ## Features
 
@@ -9,8 +13,16 @@ A powerful Raycast extension for uploading images to GitHub as an image hosting 
 - 📂 **File Upload** - Select an image file from your computer to upload
 - ⚡ **CDN Acceleration** - Support for jsDelivr or custom CDN templates for fast image loading
 - 🏷️ **Custom Filenames** - Set image names via command argument or configurable templates with time/date placeholders
+
+![formats](metadata/github-image-bed-1.png)
+
+![](metadata/github-image-bed-3.png)
+
 - 🎨 **Multiple Formats** - Copy result as Markdown, HTML, or direct URL
 - ⚙️ **Configurable** - Customize repository, branch, path, CDN templates, and filename patterns
+
+![folder](metadata/github-image-bed-2.png)
+
 - 📁 **Folder Switching** - Configure multiple upload folders and quickly switch between them
 
 ## Commands
@@ -28,17 +40,17 @@ A powerful Raycast extension for uploading images to GitHub as an image hosting 
 
 Before using, configure the extension preferences in Raycast:
 
-| Preference        | Description                                     | Required |
-| ----------------- | ----------------------------------------------- | -------- |
-| GitHub Token      | Personal Access Token with `repo` scope         | ✅       |
-| Repository Owner  | Your GitHub username or organization            | ✅       |
-| Repository Name   | The repository to upload images to              | ✅       |
-| Branch            | Branch name (default: `main`)                   | ❌       |
+| Preference        | Description                                                       | Required |
+| ----------------- | ----------------------------------------------------------------- | -------- |
+| GitHub Token      | Personal Access Token with `repo` scope                           | ✅       |
+| Repository Owner  | Your GitHub username or organization                              | ✅       |
+| Repository Name   | The repository to upload images to                                | ✅       |
+| Branch            | Branch name (default: `main`)                                     | ❌       |
 | Upload Path       | Folder paths, separated by commas (e.g., `images/, screenshots/`) | ❌       |
-| Committer Email   | Email for commit messages                       | ✅       |
-| CDN URL Template  | Custom CDN URL (default: jsDelivr)              | ❌       |
-| Default Format    | Default output format (Markdown/URL/HTML)       | ❌       |
-| Filename Template | Template for naming uploaded images             | ❌       |
+| Committer Email   | Email for commit messages                                         | ✅       |
+| CDN URL Template  | Custom CDN URL (default: jsDelivr)                                | ❌       |
+| Default Format    | Default output format (Markdown/URL/HTML)                         | ❌       |
+| Filename Template | Template for naming uploaded images                               | ❌       |
 
 ### Filename Template
 
