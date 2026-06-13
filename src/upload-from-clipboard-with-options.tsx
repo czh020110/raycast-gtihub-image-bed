@@ -21,9 +21,7 @@ import ResultList from "./components/ResultList";
 /**
  * Main command: Upload clipboard image and choose output format
  */
-export default function Command(
-  props: LaunchProps<{ arguments: Arguments }>,
-) {
+export default function Command(props: LaunchProps<{ arguments: Arguments }>) {
   const preferences = getPreferenceValues<Preferences>();
   const { imageName } = props.arguments;
   const [result, setResult] = useState<UploadResult>({
@@ -37,7 +35,7 @@ export default function Command(
     if (hasUploaded.current) return;
     hasUploaded.current = true;
 
-    (async ()=> {
+    (async () => {
       try {
         const image = await getImageFromClipboard();
 

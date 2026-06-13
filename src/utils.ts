@@ -116,9 +116,7 @@ export function parsePathList(pathValue: string): string[] {
  * Get the currently active upload path.
  * Reads from LocalStorage first; falls back to first path from preferences.
  */
-export async function getActivePath(
-  preferences: Preferences,
-): Promise<string> {
+export async function getActivePath(preferences: Preferences): Promise<string> {
   const stored = await LocalStorage.getItem<string>("activePath");
   if (stored) return stored;
   const paths = parsePathList(preferences.path);
@@ -303,9 +301,7 @@ export async function getImageFromClipboard(): Promise<{
  * - Exit code 0 + file exists = screenshot taken
  * - Exit code non-zero / no file = user cancelled (Escape) or error
  */
-export function takeScreenshot(
-  filePath: string,
-): Promise<Buffer | null> {
+export function takeScreenshot(filePath: string): Promise<Buffer | null> {
   return new Promise((resolve) => {
     let resolved = false;
 

@@ -26,9 +26,7 @@ import ResultList from "./components/ResultList";
  * Main command: Select image file and upload to GitHub
  * Uses Raycast native Form.FilePicker for file selection
  */
-export default function Command(
-  props: LaunchProps<{ arguments: Arguments }>,
-) {
+export default function Command(props: LaunchProps<{ arguments: Arguments }>) {
   const preferences = getPreferenceValues<Preferences>();
   const { imageName } = props.arguments;
   const [phase, setPhase] = useState<"pick" | "result">("pick");

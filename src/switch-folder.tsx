@@ -32,7 +32,7 @@ export default function Command() {
         <List.EmptyView
           icon={Icon.Folder}
           title="No Folders Configured"
-          description='Add folder paths in extension preferences, separated by commas (e.g., images/, screenshots/)'
+          description="Add folder paths in extension preferences, separated by commas (e.g., images/, screenshots/)"
         />
       </List>
     );

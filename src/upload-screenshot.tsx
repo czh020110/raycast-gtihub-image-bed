@@ -29,16 +29,13 @@ export default async function Command(
   const { imageName } = props.arguments;
 
   // Prepare temp file path for screenshot output
-  const screenshotPath = path.join(
-    os.tmpdir(),
-    `screenshot-${Date.now()}.png`,
-  );
+  const screenshotPath = path.join(os.tmpdir(), `screenshot-${Date.now()}.png`);
 
   // Start screencapture (non-blocking spawn)
   const screenshotPromise = takeScreenshot(screenshotPath);
 
   // Close Raycast window so user can see the screen for selection
-  await closeMainWindow({clearRootSearch: true });
+  await closeMainWindow({ clearRootSearch: true });
 
   // Wait for screencapture to finish (user completes selection or cancels)
   const buffer = await screenshotPromise;

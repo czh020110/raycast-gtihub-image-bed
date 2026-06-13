@@ -1,6 +1,5 @@
 // @ts-nocheck - Raycast internal React types conflict with @types/react v18
 import { LaunchProps } from "@raycast/api";
-import { useState, useEffect } from "react";
 import ResultList from "./components/ResultList";
 
 interface LaunchContext {

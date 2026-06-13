@@ -33,10 +33,7 @@ export default async function Command(
   const { imageName } = props.arguments;
 
   // Prepare temp file path for screenshot output
-  const screenshotPath = path.join(
-    os.tmpdir(),
-    `screenshot-${Date.now()}.png`,
-  );
+  const screenshotPath = path.join(os.tmpdir(), `screenshot-${Date.now()}.png`);
 
   // Start screencapture (non-blocking spawn)
   const screenshotPromise = takeScreenshot(screenshotPath);

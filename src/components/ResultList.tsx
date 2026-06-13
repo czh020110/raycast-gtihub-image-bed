@@ -1,11 +1,5 @@
 // @ts-nocheck - Raycast internal React types conflict with @types/react v18
-import {
-  List,
-  ActionPanel,
-  Action,
-  Icon,
-  Clipboard,
-} from "@raycast/api";
+import { List, ActionPanel, Action, Icon } from "@raycast/api";
 
 interface ResultListProps {
   url: string;
@@ -53,7 +47,7 @@ export default function ResultList({ url }: ResultListProps) {
           accessories={[{ text: "<img>" }]}
           actions={
             <ActionPanel>
-              <Action.CopyToClipboard title="Copy HTML" content={htmlUrl} />
+              <Action.CopyToClipboard title="Copy Html" content={htmlUrl} />
             </ActionPanel>
           }
         />
