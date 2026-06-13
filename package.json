@@ -4,11 +4,13 @@
   "title": "GitHub Image Bed",
   "description": "Upload images to GitHub as an image hosting service with CDN acceleration support.",
   "icon": "image.png",
-  "author": "czh020110",
+  "author": "zh_chen",
   "categories": [
     "Productivity"
   ],
-  "platforms": ["macOS"],
+  "platforms": [
+    "macOS"
+  ],
   "license": "MIT",
   "commands": [
     {
