@@ -16,7 +16,7 @@ type ExtensionPreferences = {
   "repo": string,
   /** Branch - Branch to upload images to. */
   "branch": string,
-  /** Upload Path - Folder path within the repository to store images. */
+  /** Upload Path - Folder path(s) within the repository. Separate multiple paths with commas (e.g., images/, screenshots/). The first path is used by default. */
   "path": string,
   /** Committer Email - Email address for commit messages. */
   "email": string,
@@ -44,6 +44,8 @@ declare namespace Preferences {
   export type ChooseFormat = ExtensionPreferences & {}
   /** Preferences accessible in the `upload-from-file` command */
   export type UploadFromFile = ExtensionPreferences & {}
+  /** Preferences accessible in the `switch-folder` command */
+  export type SwitchFolder = ExtensionPreferences & {}
 }
 
 declare namespace Arguments {
@@ -74,5 +76,7 @@ declare namespace Arguments {
   /** Image name */
   "imageName": string
 }
+  /** Arguments passed to the `switch-folder` command */
+  export type SwitchFolder = {}
 }
 

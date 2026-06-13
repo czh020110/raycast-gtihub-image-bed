@@ -11,6 +11,7 @@ A powerful Raycast extension for uploading images to GitHub as an image hosting 
 - 🏷️ **Custom Filenames** - Set image names via command argument or configurable templates with time/date placeholders
 - 🎨 **Multiple Formats** - Copy result as Markdown, HTML, or direct URL
 - ⚙️ **Configurable** - Customize repository, branch, path, CDN templates, and filename patterns
+- 📁 **Folder Switching** - Configure multiple upload folders and quickly switch between them
 
 ## Commands
 
@@ -21,6 +22,7 @@ A powerful Raycast extension for uploading images to GitHub as an image hosting 
 | **Upload Screenshot**                  | No View | Capture a screenshot and upload it immediately                |
 | **Upload Screenshot with Options**     | View    | Capture a screenshot, upload it, and choose output format     |
 | **Upload from File**                   | View    | Open file picker to select and upload an image                |
+| **Switch Folder**                      | View    | Switch the active upload folder                               |
 
 ## Configuration
 
@@ -32,7 +34,7 @@ Before using, configure the extension preferences in Raycast:
 | Repository Owner  | Your GitHub username or organization            | ✅       |
 | Repository Name   | The repository to upload images to              | ✅       |
 | Branch            | Branch name (default: `main`)                   | ❌       |
-| Upload Path       | Folder path in the repository (e.g., `images/`) | ❌       |
+| Upload Path       | Folder paths, separated by commas (e.g., `images/, screenshots/`) | ❌       |
 | Committer Email   | Email for commit messages                       | ✅       |
 | CDN URL Template  | Custom CDN URL (default: jsDelivr)              | ❌       |
 | Default Format    | Default output format (Markdown/URL/HTML)       | ❌       |
@@ -89,14 +91,14 @@ Available placeholders:
 
 ### 1. From Clipboard
 
-1. Copy an image to your clipboard (or a file from Finder/Explorer).
+1. Copy an image to your clipboard (or a file from Finder).
 2. Run **Upload from Clipboard**.
 3. The image is uploaded, and the link is automatically copied.
 
 ### 2. Screenshot
 
 1. Run **Upload Screenshot**.
-2. Raycast will hide, and the system screenshot tool (`ms-screenclip` on Windows) will open.
+2. Raycast will hide, and the system screenshot tool will open.
 3. Capture your area.
 4. Raycast will reappear, upload the image, and copy the link.
    - Use **Upload Screenshot with Options** if you want to select the link format manually.
@@ -107,6 +109,13 @@ Available placeholders:
 2. A file picker dialog will appear.
 3. Select your image file.
 4. The image is uploaded, and you can choose the link format to copy.
+
+### 4. Switch Folder
+
+1. Configure multiple folder paths in **Upload Path** preference, separated by commas (e.g., `images/, screenshots/, avatars/`).
+2. Run **Switch Folder**.
+3. Select the folder you want to upload to. The active folder is remembered across sessions.
+4. All upload commands will use the selected folder.
 
 ## License
 

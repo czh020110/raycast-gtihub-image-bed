@@ -4,7 +4,7 @@ import * as path from "path";
 import { spawn } from "child_process";
 import dayjs from "dayjs";
 import { runAppleScript } from "@raycast/utils";
-import { Clipboard } from "@raycast/api";
+import { Clipboard, LocalStorage } from "@raycast/api";
 import { Octokit } from "@octokit/core";
 import { fileTypeFromBuffer } from "file-type";
 
@@ -98,6 +98,38 @@ export function normalizePath(p: string): string {
     normalized += "/";
   }
   return normalized;
+}
+
+/**
+ * Parse comma-separated path list from preferences.
+ * Returns array of normalized paths.
+ */
+export function parsePathList(pathValue: string): string[] {
+  if (!pathValue || !pathValue.trim()) return [];
+  return pathValue
+    .split(",")
+    .map((s) => normalizePath(s.trim()))
+    .filter((s) => s.length > 0);
+}
+
+/**
+ * Get the currently active upload path.
+ * Reads from LocalStorage first; falls back to first path from preferences.
+ */
+export async function getActivePath(
+  preferences: Preferences,
+): Promise<string> {
+  const stored = await LocalStorage.getItem<string>("activePath");
+  if (stored) return stored;
+  const paths = parsePathList(preferences.path);
+  return paths.length > 0 ? paths[0] : normalizePath(preferences.path);
+}
+
+/**
+ * Set the currently active upload path in LocalStorage
+ */
+export async function setActivePath(path: string): Promise<void> {
+  await LocalStorage.setItem("activePath", path);
 }
 
 /**
@@ -334,7 +366,7 @@ export async function uploadImageBuffer(
   imageName: string = "",
 ): Promise<string> {
   const content = buffer.toString("base64");
-  const p = normalizePath(preferences.path);
+  const p = normalizePath(await getActivePath(preferences));
   const filename = generateFilenameFromTemplate(
     preferences.filenameTemplate,
     ext,

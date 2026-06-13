@@ -85,6 +85,12 @@
           "placeholder": "Image name"
         }
       ]
+    },
+    {
+      "name": "switch-folder",
+      "title": "Switch Folder",
+      "description": "Switch the active upload folder",
+      "mode": "view"
     }
   ],
   "preferences": [
@@ -123,7 +129,7 @@
       "type": "textfield",
       "required": false,
       "default": "images/",
-      "description": "Folder path within the repository to store images."
+      "description": "Folder path(s) within the repository. Separate multiple paths with commas (e.g., images/, screenshots/). The first path is used by default."
     },
     {
       "name": "email",
