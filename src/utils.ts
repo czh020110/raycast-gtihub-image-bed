@@ -319,7 +319,7 @@ export function takeScreenshot(
 
     const proc = spawn("/usr/sbin/screencapture", ["-i", "-x", filePath]);
 
-    proc.on("close", (code) => {
+    proc.on("close", (code: number | null) => {
       if (resolved) return;
       resolved = true;
 

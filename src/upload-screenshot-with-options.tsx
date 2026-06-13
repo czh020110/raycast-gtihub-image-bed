@@ -3,7 +3,6 @@ import {
   Toast,
   Clipboard,
   getPreferenceValues,
-  showHUD,
   closeMainWindow,
   open,
   environment,
